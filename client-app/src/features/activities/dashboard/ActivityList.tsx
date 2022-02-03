@@ -20,7 +20,7 @@ export default function ActivityList({activities,selectActivity}: Props)
                             <Item.Meta>{activity.date}</Item.Meta>
                             <Item.Description>
                                 <Item.Extra>
-                                    <Button onClick={() => selectActivity(activity.id)} floated='right' content='View' color='blue'></Button>
+                                    <Button onClick={() => {selectActivity(activity.id); }} floated='right' content='View' color='blue'></Button>
                                     <Label basic content={activity.category}></Label>
                                 </Item.Extra>
                             </Item.Description>

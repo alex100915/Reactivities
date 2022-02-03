@@ -1,7 +1,11 @@
 import React from "react";
 import { Button, Container, Menu, MenuItem } from "semantic-ui-react";
 
-export default function NavBar() {
+interface Props{
+    setFormVisibility : (showForm : boolean) => void
+}
+
+export default function NavBar({setFormVisibility} : Props) {
 
     return (
         <Menu inverted fixed="top">
@@ -12,7 +16,7 @@ export default function NavBar() {
                 </MenuItem>
                 <MenuItem name="Activities"/>
                 <MenuItem>
-                    <Button positive content="Create Activity"></Button>
+                    <Button onClick={() => setFormVisibility(true)} positive content="Create Activity"></Button>
                 </MenuItem>
             </Container>    
 
