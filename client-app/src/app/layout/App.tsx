@@ -40,7 +40,7 @@ function handleFormClose()
 
   return (
     <Fragment>
-    <NavBar setFormVisibility={handleSetFormVisibility}/>
+    <NavBar openForm={handleFormOpen}/>
     <Container style={{marginTop: '7em'}}>
     <ActivityDashboard 
     activities={activities}
