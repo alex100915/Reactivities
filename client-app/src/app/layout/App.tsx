@@ -1,10 +1,9 @@
 import React, { Fragment, useEffect, useState } from 'react';
-import axios from 'axios';
-import { Button, Container, Header, List } from 'semantic-ui-react';
+import { Container } from 'semantic-ui-react';
 import { Activity } from '../models/activity';
 import NavBar from './NavBar';
 import ActivityDashboard from '../../features/activities/dashboard/ActivityDashboard';
-import {v4 as uuid} from 'uuid'
+import { v4 as uuid } from 'uuid'
 import agent from '../api/agent';
 import LoadingComponent from './LoadingComponent';
 import { useStore } from '../stores/store';
@@ -13,91 +12,61 @@ import { observer } from 'mobx-react-lite';
 
 function App() {
 
-  const {activityStore}=useStore()
-  
-const[activities, setActivities]=useState<Activity[]>([]);
-const[selectedActivity, setSelectedActivity]=useState<Activity | undefined>(undefined);
-const [editMode,setEditMode] = useState(false);
-const[loading,setLoading]=useState(true);
-const[submitting,setSubmitting]=useState(false);
+  const {activityStore} = useStore()
+  const [activities, setActivities] = useState<Activity[]>([]);
+  const [selectedActivity, setSelectedActivity] = useState<Activity | undefined>(undefined);
+  const [editMode, setEditMode] = useState(false);  
+  const [submitting, setSubmitting] = useState(false);
 
-useEffect(()=>{
-  activityStore.setActivities();
-  },[activityStore]);
+  useEffect(() => {
+    activityStore.setActivities();
+  }, [activityStore]);
 
-function handleSelectActivity(id : string){
-  setSelectedActivity(activities.find(x=>x.id===id))
-}
 
-function handleCancelSelectActivity()
-{
-  setSelectedActivity(undefined);
-}
+  function handleCreateOrEditActivity(activity: Activity) {
+    setSubmitting(true);
 
-function handleFormOpen(id? : string)
-{
-  id ? handleSelectActivity(id) : handleCancelSelectActivity();
-  setEditMode(true); 
-}
-
-function handleFormClose()
-{
-  setEditMode(false);
-}
-
-function handleCreateOrEditActivity(activity : Activity)
-{
-  setSubmitting(true);
-  
-  if(activity.id)
-  {
-    agent.Activities.update(activity).then(()=>{
-      setActivities([...activities.filter(a=>a.id!==activity.id),activity])
-      setSelectedActivity(activity);
-      setEditMode(false)
-      setSubmitting(false);
-    })
+    if (activity.id) {
+      agent.Activities.update(activity).then(() => {
+        setActivities([...activities.filter(a => a.id !== activity.id), activity])
+        setSelectedActivity(activity);
+        setEditMode(false)
+        setSubmitting(false);
+      })
+    }
+    else {
+      activity.id = uuid();
+      agent.Activities.create(activity).then(() => {
+        setActivities([...activities, activity])
+        setSelectedActivity(activity);
+        setEditMode(false);
+        setSubmitting(false);
+      })
+    }
   }
-  else{
-    activity.id=uuid();
-    agent.Activities.create(activity).then(()=>{
-      setActivities([...activities,activity])
-      setSelectedActivity(activity);
-      setEditMode(false);
-      setSubmitting(false);
-    })
+
+  function handleDeleteActivity(activityId: string) {
+    setSubmitting(true);
+    agent.Activities.delete(activityId).then(() => {
+      setActivities([...activities.filter(x => x.id !== activityId)])
+      setSubmitting(false)
+    });
   }
-}
 
-function handleDeleteActivity(activityId : string)
-{
-  setSubmitting(true); 
-  agent.Activities.delete(activityId).then(()=>{
-  setActivities([...activities.filter(x=>x.id!==activityId)])
-  setSubmitting(false)
-});
-}
-
-if(activityStore.loadingInitial) return <LoadingComponent content='Loading app'></LoadingComponent>
+  if (activityStore.loadingInitial) return <LoadingComponent content='Loading app'></LoadingComponent>
 
   return (
     <Fragment>
-    <NavBar openForm={handleFormOpen}/>
-    <Container style={{marginTop: '7em'}}>
-    <ActivityDashboard 
-    activities={activityStore.activities}
-    selectActivity={handleSelectActivity}
-    selectedActivity={selectedActivity}
-    cancelSelectActivity={handleCancelSelectActivity}
-    editMode={editMode}
-    openForm={handleFormOpen}
-    closeForm={handleFormClose}
-    createOrEditActivity={handleCreateOrEditActivity}
-    deleteActivity={handleDeleteActivity}
-    submitting={submitting}
-     />
-    </Container>    
-  </Fragment>
+      <NavBar />
+      <Container style={{ marginTop: '7em' }}>
+        <ActivityDashboard
+          activities={activityStore.activities}          
+          createOrEditActivity={handleCreateOrEditActivity}
+          deleteActivity={handleDeleteActivity}
+          submitting={submitting}
+        />
+      </Container>
+    </Fragment>
   );
 }
 

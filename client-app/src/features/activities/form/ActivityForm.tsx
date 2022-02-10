@@ -2,17 +2,19 @@ import axios from "axios";
 import React, { ChangeEvent, useEffect, useState } from "react";
 import { Button, Form, Segment } from "semantic-ui-react";
 import { Activity } from "../../../app/models/activity";
+import { useStore } from "../../../app/stores/store";
 
 interface Props{    
-    activity: Activity | undefined;
-    closeForm: () => void
     createOrEditActivity:(activity: Activity) => void
     submitting: boolean    
 }
 
 
-export default function ActivityForm({activity: selectedActivity, closeForm, createOrEditActivity,submitting} : Props){
-    
+export default function ActivityForm({createOrEditActivity,submitting} : Props){
+
+    const {activityStore} = useStore();
+    const {selectedActivity,closeForm}=activityStore;
+
     const initialState = selectedActivity ?? {
         id: '',
         title: '',
@@ -39,6 +41,7 @@ export default function ActivityForm({activity: selectedActivity, closeForm, cre
     }
     
     return(
+
         <Segment clearing>
             <Form onSubmit={handleSubmit} autoComplete='off'>
                 <Form.Input placeholder='Title' value={activity.title} name='title' onChange={handleInputChange}></Form.Input>
