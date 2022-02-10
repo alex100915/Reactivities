@@ -22,16 +22,8 @@ const[loading,setLoading]=useState(true);
 const[submitting,setSubmitting]=useState(false);
 
 useEffect(()=>{
-  agent.Activities.list().then(response=> {
-    let activities: Activity[]=[];
-    response.forEach(activity=>{
-      activity.date=activity.date.split("T")[0]
-      activities.push(activity)
-    })
-    setActivities(activities); 
-    setLoading(false);
-  })
-},[]);
+  activityStore.setActivities();
+  },[activityStore]);
 
 function handleSelectActivity(id : string){
   setSelectedActivity(activities.find(x=>x.id===id))
@@ -86,16 +78,14 @@ function handleDeleteActivity(activityId : string)
 });
 }
 
-if(loading) return <LoadingComponent content='Loading app'></LoadingComponent>
+if(activityStore.loadingInitial) return <LoadingComponent content='Loading app'></LoadingComponent>
 
   return (
     <Fragment>
     <NavBar openForm={handleFormOpen}/>
     <Container style={{marginTop: '7em'}}>
-      <h2>{activityStore.title}</h2>
-      <Button content='Add exclamation!' positive onClick={activityStore.setTitle} />
     <ActivityDashboard 
-    activities={activities}
+    activities={activityStore.activities}
     selectActivity={handleSelectActivity}
     selectedActivity={selectedActivity}
     cancelSelectActivity={handleCancelSelectActivity}
