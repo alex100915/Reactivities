@@ -1,63 +1,57 @@
 import axios from "axios";
+import { observer } from "mobx-react-lite";
 import React, { ChangeEvent, useEffect, useState } from "react";
 import { Button, Form, Segment } from "semantic-ui-react";
 import { Activity } from "../../../app/models/activity";
 import { useStore } from "../../../app/stores/store";
 
-interface Props{    
-    createOrEditActivity:(activity: Activity) => void
-    submitting: boolean    
-}
 
+export default observer(function ActivityForm() {
 
-export default function ActivityForm({createOrEditActivity,submitting} : Props){
-
-    const {activityStore} = useStore();
-    const {selectedActivity,closeForm}=activityStore;
+    const { activityStore } = useStore();
+    const { selectedActivity, closeForm, loading, createActivity, updateActivity } = activityStore;
 
     const initialState = selectedActivity ?? {
         id: '',
         title: '',
         date: '',
-        description:'',
+        description: '',
         category: '',
         city: '',
         venue: ''
     }
 
-    const [activity, setActivity]=useState(initialState);
+    const [activity, setActivity] = useState(initialState);
 
 
-    function handleInputChange(event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>)
-    {
-        const {name,value}=event.target;
+    function handleInputChange(event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) {
+        const { name, value } = event.target;
 
-        setActivity({...activity, [name]:value});
+        setActivity({ ...activity, [name]: value });
     }
 
-    function handleSubmit()
-    {
-        createOrEditActivity(activity);
+    function handleSubmit() {
+        activity.id ? updateActivity(activity) : createActivity(activity)
     }
-    
-    return(
+
+    return (
 
         <Segment clearing>
             <Form onSubmit={handleSubmit} autoComplete='off'>
                 <Form.Input placeholder='Title' value={activity.title} name='title' onChange={handleInputChange}></Form.Input>
                 <Form.TextArea placeholder='Description' name='description' value={activity.description} onChange={handleInputChange} ></Form.TextArea>
                 <Form.Input placeholder='Category' name='category' value={activity.category} onChange={handleInputChange}></Form.Input>
-                <Form.Input 
-                placeholder='Date' 
-                type="date"
-                name='date' 
-                value={activity.date} 
-                onChange={handleInputChange}/>                    
+                <Form.Input
+                    placeholder='Date'
+                    type="date"
+                    name='date'
+                    value={activity.date}
+                    onChange={handleInputChange} />
                 <Form.Input placeholder='City' name='city' value={activity.city} onChange={handleInputChange}></Form.Input>
                 <Form.Input placeholder='Venue' name='venue' value={activity.venue} onChange={handleInputChange}></Form.Input>
-                <Button loading={submitting} floated='right' positive type="submit" content="Submit" />
+                <Button loading={loading} floated='right' positive type="submit" content="Submit" />
                 <Button onClick={closeForm} floated='right' positive type="button" content="Cancel" />
             </Form>
         </Segment>
     )
-}
+})
