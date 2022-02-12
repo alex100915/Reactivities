@@ -1,16 +1,13 @@
+import { observer } from "mobx-react-lite";
 import React, { SyntheticEvent, useState } from "react";
 import { Button, Item, Label, Segment } from "semantic-ui-react";
 import { Activity } from "../../../app/models/activity";
 import { useStore } from "../../../app/stores/store";
 
-interface Props {
-    activities: Activity[];
-    deleteActivity: (id: string) => void
-    submitting: boolean
-}
+export default observer (function ActivityList() {
 
-export default function ActivityList({ activities, deleteActivity, submitting }: Props) {
-
+    const { activityStore } = useStore();
+    const{activitiesByDate,selectActivity,loading,deleteActivity}=activityStore;
     const [target, setTarget] = useState('');
 
     function handleDeleteActivity(e: SyntheticEvent<HTMLButtonElement>, id: string) {
@@ -18,12 +15,11 @@ export default function ActivityList({ activities, deleteActivity, submitting }:
         deleteActivity(id);
     }
 
-    const { activityStore } = useStore();
 
     return (
         <Segment>
             <Item.Group divided>
-                {activities.map(activity => (
+                {activitiesByDate.map(activity => (
                     <Item key={activity.id}>
                         <Item.Content>
                             <Item.Header as='a'>{activity.title}</Item.Header>
@@ -33,7 +29,7 @@ export default function ActivityList({ activities, deleteActivity, submitting }:
                                     <Button onClick={() => { activityStore.selectActivity(activity.id); }} floated='right' content='View' color='blue'></Button>
                                     <Button
                                         name={activity.id}
-                                        loading={submitting && activity.id === target}
+                                        loading={loading && activity.id === target}
                                         onClick={(e) => handleDeleteActivity(e, activity.id)}
                                         floated='right'
                                         content='Delete'
@@ -47,4 +43,4 @@ export default function ActivityList({ activities, deleteActivity, submitting }:
             </Item.Group>
         </Segment>
     )
-}
+})
