@@ -32,7 +32,7 @@ export default observer(function ActivityForm() {
         else
             setLoadingIntitial(false);
 
-    }, [id, loadActivity])
+    }, [id, loadActivity,setLoadingIntitial])
 
     function handleInputChange(event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) {
         const { name, value } = event.target;
