@@ -1,3 +1,4 @@
+import { format } from "date-fns";
 import { makeAutoObservable, runInAction } from "mobx";
 import agent from "../api/agent";
 import { Activity } from '../models/activity';
@@ -5,7 +6,7 @@ import { Activity } from '../models/activity';
 
 export default class ActivityStore {
     activityRegistry = new Map<string, Activity>();
-    loadingInitial = true;
+    loadingInitial = false;
     selectedActivity: Activity | undefined = undefined;
     editMode = false;
     loading = false;
@@ -15,16 +16,16 @@ export default class ActivityStore {
     }
 
     get activitiesByDate() {
-        return Array.from(this.activityRegistry.values()).sort((x, y) => Date.parse(x.date) - Date.parse(y.date));
+        return Array.from(this.activityRegistry.values()).sort((x, y) => x.date!.getTime() - y.date!.getTime());
     }
 
-    get groupedActivities(){
+    get groupedActivities() {
         return Object.entries(
-            this.activitiesByDate.reduce((activities,activity)=>{
-                const date=activity.date;
-                activities[date]=activities[date] ? [...activities[date],activity]:[activity];
+            this.activitiesByDate.reduce((activities, activity) => {
+                const date = format(activity.date!, 'dd MM yyyy')
+                activities[date] = activities[date] ? [...activities[date], activity] : [activity];
                 return activities;
-            }, {} as {[key: string]: Activity[]})
+            }, {} as { [key: string]: Activity[] })
         )
     }
 
@@ -46,19 +47,18 @@ export default class ActivityStore {
     loadActivity = async (id: string) => {
         let activity = this.getActivity(id);
 
-        if (activity)
-        {
-            this.selectedActivity=activity;
+        if (activity) {
+            this.selectedActivity = activity;
             return activity;
         }
         else {
             try {
                 this.setLoadingIntitial(true);
-                let activity = await agent.Activities.details(id);                
+                let activity = await agent.Activities.details(id);
                 this.setActivity(activity);
                 this.selectedActivity = activity;
                 this.setLoadingIntitial(false);
-                
+
                 return activity;
             }
             catch (error) {
@@ -69,7 +69,7 @@ export default class ActivityStore {
     }
 
     private setActivity = (activity: Activity) => {
-        activity.date = activity.date.split("T")[0]
+        activity.date = new Date(activity.date!)
         this.activityRegistry.set(activity.id, activity);
     }
 
