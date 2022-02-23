@@ -37,7 +37,6 @@ export default class ActivityStore {
                 this.setActivity(activity);
             })
             this.setLoadingIntitial(false)
-
         } catch (error) {
             console.log(error);
             this.setLoadingIntitial(false)
@@ -58,7 +57,6 @@ export default class ActivityStore {
                 this.setActivity(activity);
                 this.selectedActivity = activity;
                 this.setLoadingIntitial(false);
-
                 return activity;
             }
             catch (error) {
