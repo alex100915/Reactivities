@@ -21,3 +21,15 @@ export interface Photo{
     url: string,
     isMain: boolean
 }
+
+export interface UpdateAbout{
+    displayName: string;
+    bio? : string;
+}
+
+export  class UpdateAbout implements UpdateAbout{
+    constructor(profile: Profile){
+        this.displayName=profile.displayName;
+        this.bio=profile.bio;
+    }
+}

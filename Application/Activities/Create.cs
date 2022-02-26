@@ -18,7 +18,6 @@ namespace Application.Activities
         public class Command : IRequest<Result<Unit>>
         {
             public Activity Activity { get; set; }
-            //user object
         }
 
         public class CommandValidator : AbstractValidator<Command>

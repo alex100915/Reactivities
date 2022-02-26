@@ -2,7 +2,7 @@ import axios, { AxiosError, AxiosResponse } from "axios";
 import { toast } from "react-toastify";
 import { history } from "../..";
 import { Activity, ActivityFormValues } from "../models/activity";
-import { Photo, Profile } from "../models/Profile";
+import { Photo, Profile, UpdateAbout } from "../models/Profile";
 import { User, UserFromValues } from "../models/user";
 import { store } from "../stores/store";
 
@@ -100,7 +100,8 @@ const Profiles = {
         })
     },
     setMainPhoto: (id: string) => requests.post(`/photos/${id}/setMain`,{}),
-    deletePhoto: (id:string) => requests.delete(`/photos/${id}`)
+    deletePhoto: (id:string) => requests.delete(`/photos/${id}`),
+    updateAbout: (profile: UpdateAbout) => requests.put(`/profiles`,profile)
 }
 
 const agent = {
