@@ -28,37 +28,39 @@ export default class UserStore {
         }
     }
 
-    logout=() =>{
+    logout = () => {
         store.commonStore.setToken(null)
         window.localStorage.removeItem('jwt');
-        this.user=null;
-        history.push('/');        
+        this.user = null;
+        history.push('/');
     }
-    
-    getUser = async()=>{
-        try{
-            const user= await agent.Account.current();
-            runInAction(()=> this.user=user);
-        } catch(error){
+
+    getUser = async () => {
+        try {
+            const user = await agent.Account.current();
+            runInAction(() => this.user = user);
+        } catch (error) {
             console.log(error)
         }
     }
 
-    register = async(creds: UserFromValues) =>{
-        try{
-            const user= await agent.Account.register(creds);
+    register = async (creds: UserFromValues) => {
+        try {
+            const user = await agent.Account.register(creds);
             store.commonStore.setToken(user.token)
-            runInAction(()=> this.user=user);
+            runInAction(() => this.user = user);
             history.push('/activities')
             store.modalStore.closeModal();
         }
-        catch(error)
-        {
+        catch (error) {
             throw error
         }
     }
 
-    setImage = (image:string) =>{
-        if(this.user) this.user.image=image;
+    setImage = (image: string) => {
+        if (this.user) this.user.image = image;
+    }
+    setDisplayName = (name: string) => {
+        if (this.user) this.user.displayName = name;
     }
 }
