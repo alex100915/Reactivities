@@ -20,7 +20,14 @@ export class Profile implements Profile{
 }
 
 export interface Photo{
-    id: string,
+    id: string, 
     url: string,
     isMain: boolean
+}
+
+export interface ProfileActivity{
+    id :string
+    title: string
+    category: string
+    date: Date | null
 }
