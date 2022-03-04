@@ -136,7 +136,7 @@ export default class ProfileStore {
                     following ? this.profile.followersCount++ : this.profile.followersCount--;
                     this.profile.following = !this.profile.following;
                 }
-                if (this.profile && this.profile.username === store.userStore.user?.username) {
+                if (this.profile && this.profile.username === store.userStore.user?.username) { 
                     following ? this.profile.followingCount++ : this.profile.followingCount--;
                 }
                 this.followings.forEach(profile => {
