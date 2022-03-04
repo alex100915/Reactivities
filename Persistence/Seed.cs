@@ -255,8 +255,15 @@ namespace Persistence
                     }
                 };
 
-                await context.Activities.AddRangeAsync(activities);
+                try{
+await context.Activities.AddRangeAsync(activities);
                 await context.SaveChangesAsync();
+                }
+                catch(Exception ex)
+                {
+                    
+                }
+                
             }
         }
     }

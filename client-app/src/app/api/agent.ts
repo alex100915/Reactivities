@@ -7,7 +7,7 @@ import { Photo, Profile, ProfileActivity } from "../models/Profile";
 import { User, UserFromValues } from "../models/user";
 import { store } from "../stores/store";
 
-axios.defaults.baseURL = "http://localhost:5000/api"
+axios.defaults.baseURL = process.env.REACT_APP_API_URL;
 
 const sleep = (delay: number) => {
     return new Promise((resolve) => {
@@ -17,7 +17,6 @@ const sleep = (delay: number) => {
 
 axios.interceptors.request.use(config => {
     const token = store.commonStore.token;
-
     if (token && config.headers)
         config.headers.Authorization = `Bearer ${token}`;
 
@@ -25,7 +24,7 @@ axios.interceptors.request.use(config => {
 })
 
 axios.interceptors.response.use(async response => {
-    await sleep(1000);
+    if(process.env.NODE_ENV==='development') await sleep(1000);
     const pagination=response.headers['pagination'];
     if(pagination){
         response.data=new PaginatedResult(response.data,JSON.parse(pagination))

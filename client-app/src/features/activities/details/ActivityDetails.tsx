@@ -17,12 +17,8 @@ export default observer(function ActivityDetails() {
   const { id } = useParams<{ id: string }>()
 
   useEffect(() => {
-    loadActivity(id);
-
-    return () => {
-      clearSelectedActivity();
-    }
-  }, [id, activity, clearSelectedActivity])
+    loadActivity(id);    
+  }, [id, activity])
 
   if (loadingInitial || activity == undefined) return <LoadingComponent />;
 

@@ -1,10 +1,8 @@
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
+using Application.Comments;
 using MediatR;
 using Microsoft.AspNetCore.SignalR;
-using Application.Comments;
 
 namespace API.SignalR
 {
@@ -29,7 +27,7 @@ namespace API.SignalR
             var httpContext = Context.GetHttpContext();
             var activityId = httpContext.Request.Query["activityId"];
             await Groups.AddToGroupAsync(Context.ConnectionId, activityId);
-            var result = await _mediator.Send(new List.Query { ActivityId = Guid.Parse(activityId) });
+            var result = await _mediator.Send(new List.Query{ActivityId = Guid.Parse(activityId)});
             await Clients.Caller.SendAsync("LoadComments", result.Value);
         }
     }

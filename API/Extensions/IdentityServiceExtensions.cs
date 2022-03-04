@@ -38,9 +38,9 @@ namespace API.Extensions
                         ValidateIssuer = false
                     };
 
-                    opt.Events = new JwtBearerEvents
+                   opt.Events = new JwtBearerEvents
                     {
-                        OnMessageReceived = context =>
+                        OnMessageReceived = context => 
                         {
                             var accessToken = context.Request.Query["access_token"];
                             var path = context.HttpContext.Request.Path;
