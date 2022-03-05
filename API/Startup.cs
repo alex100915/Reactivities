@@ -58,7 +58,8 @@ namespace API
                     "https://cdn.jsdelivr.net/",
                     "sha256-+oGcdj5BhO6SoiIGYIkPOMYi7d2h2Pp/bkJLBfYL+kk=",
                     "sha256-3x3EykMfFJtFd84iFKuZG0MoGAo5XdRfl3rq3r//ydA=", 
-                    "sha256-HIgflxNtM43xg36bBIUoPTUuo+CXZ319LsTVRtsZ/VU="
+                    "sha256-HIgflxNtM43xg36bBIUoPTUuo+CXZ319LsTVRtsZ/VU=",
+                    "sha256-yChqzBduCCi4o4xdbXRXh4U/t1rP4UUUMJt+rB+ylUI="
                 ))
                 .FontSources(s => s.Self().CustomSources(
                     "https://fonts.gstatic.com", "data:", "https://cdn.jsdelivr.net"
@@ -77,7 +78,8 @@ namespace API
                         "https://connect.facebook.net",
                         "https://cdn.jsdelivr.net",
                         "sha256-3x3EykMfFJtFd84iFKuZG0MoGAo5XdRfl3rq3r//ydA=",
-                    "sha256-HIgflxNtM43xg36bBIUoPTUuo+CXZ319LsTVRtsZ/VU="
+                    "sha256-HIgflxNtM43xg36bBIUoPTUuo+CXZ319LsTVRtsZ/VU=",
+                    "sha256-Fjxwlc03HEtscIoEOQWndins/qeMz23xrElvakycbao="
                     ))
             );
 
