@@ -84,11 +84,11 @@ export default class UserStore {
                     this.user = user;
                     this.fbLoading = false;
                 })
+                history.push('/activities')
             }).catch(error => {
                 console.log(error);
                 runInAction(() => this.fbLoading = false);
             })
-            history.push('/activities')
         }
 
         if (this.fbAccessToken) {
