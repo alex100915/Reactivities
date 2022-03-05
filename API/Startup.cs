@@ -49,17 +49,19 @@ namespace API
             app.UseReferrerPolicy(opt => opt.NoReferrer());
             app.UseXXssProtection(opt => opt.EnabledWithBlockMode());
             app.UseXfo(opt => opt.Deny());
-            app.UseCsp(opt => opt
+            app.UseCspReportOnly(opt => opt
                 .BlockAllMixedContent()
                 .StyleSources(s => s.Self().CustomSources(
                     "https://fonts.googleapis.com",
                     "sha256-/epqQuRElKW1Z83z1Sg8Bs2MKi99Nrq41Z3fnS2Nrgk=",
                     "sha256-2aahydUs+he2AO0g7YZuG67RGvfE9VXGbycVgIwMnBI=",
+                    "https://cdn.jsdelivr.net/",
                     "sha256-+oGcdj5BhO6SoiIGYIkPOMYi7d2h2Pp/bkJLBfYL+kk=",
-                    "https://cdn.jsdelivr.net/"
+                    "sha256-3x3EykMfFJtFd84iFKuZG0MoGAo5XdRfl3rq3r//ydA=", 
+                    "sha256-HIgflxNtM43xg36bBIUoPTUuo+CXZ319LsTVRtsZ/VU="
                 ))
                 .FontSources(s => s.Self().CustomSources(
-                    "https://fonts.gstatic.com", "data:","https://cdn.jsdelivr.net"
+                    "https://fonts.gstatic.com", "data:", "https://cdn.jsdelivr.net"
                 ))
                 .FormActions(s => s.Self())
                 .FrameAncestors(s => s.Self())
@@ -73,8 +75,9 @@ namespace API
                     .CustomSources(
                         "sha256-HIgflxNtM43xg36bBIUoPTUuo+CXZ319LsTVRtsZ/VU=",
                         "https://connect.facebook.net",
+                        "https://cdn.jsdelivr.net",
                         "sha256-3x3EykMfFJtFd84iFKuZG0MoGAo5XdRfl3rq3r//ydA=",
-                        "https://cdn.jsdelivr.net"
+                    "sha256-HIgflxNtM43xg36bBIUoPTUuo+CXZ319LsTVRtsZ/VU="
                     ))
             );
 
@@ -92,9 +95,9 @@ namespace API
                 app.UseSwagger();
                 app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "API v1"));
             }
-            else 
+            else
             {
-                app.Use(async (context, next) => 
+                app.Use(async (context, next) =>
                 {
                     context.Response.Headers.Add("Strict-Transport-Security", "max-age=31536000");
                     await next.Invoke();
@@ -103,7 +106,7 @@ namespace API
 
 
 
-            // app.UseHttpsRedirection();
+            app.UseHttpsRedirection();
 
             app.UseRouting();
 

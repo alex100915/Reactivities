@@ -30,6 +30,7 @@ function App() {
     }
     else
     {
+      userStore.getFacebookLoginStatus().then(()=>commonStore.setAppLoaded())
       commonStore.setAppLoaded();
     }
   },[commonStore,userStore])
@@ -39,7 +40,7 @@ function App() {
 
   return (
     <>
-      <ToastContainer position='bottom-right' hideProgressBar />
+      <ToastContainer position='bottom-right'  hideProgressBar />
       <ModalContainer/>
       <Route path='/' exact component={HomePage}></Route>
       <Route path={"/(.+)"}
