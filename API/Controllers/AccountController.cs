@@ -7,6 +7,9 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.EntityFrameworkCore;
 using System.Security.Claims;
 using Newtonsoft.Json;
+using Infrastructure.Email;
+using Microsoft.AspNetCore.WebUtilities;
+using System.Text;
 
 namespace API.Controllers
 {
@@ -16,18 +19,20 @@ namespace API.Controllers
     {
         private readonly UserManager<AppUser> _userManager;
         private readonly IConfiguration _config;
+        private readonly EmailSender _emailSender;
         private readonly SignInManager<AppUser> _signInManager;
         private readonly TokenService _tokenService;
         private readonly HttpClient _httpClient;
 
         public AccountController(UserManager<AppUser> userManager, SignInManager<AppUser> signInManager,
         TokenService tokenService,
-        IConfiguration config)
+        IConfiguration config, EmailSender emailSender)
         {
             _signInManager = signInManager;
             _tokenService = tokenService;
             _userManager = userManager;
             _config = config;
+            _emailSender = emailSender;
             _httpClient = new HttpClient()
             {
                 BaseAddress = new Uri("https://graph.facebook.com")
@@ -39,7 +44,9 @@ namespace API.Controllers
         {
             var user = await _userManager.Users.Include(p => p.Photos).FirstOrDefaultAsync(x => x.Email == loginDto.Email);
 
-            if (user == null) return Unauthorized();
+            if (user == null) return Unauthorized("Invalid email");
+
+            if (!user.EmailConfirmed) return Unauthorized("Email not confirmed");
 
             var result = _signInManager.CheckPasswordSignInAsync(user, loginDto.Password, false);
 
@@ -70,13 +77,56 @@ namespace API.Controllers
 
             var result = await _userManager.CreateAsync(user, registerDto.Password);
 
-            if (result.Succeeded)
-            {
-                await SetRefreshToken(user);
-                return CreateUserObject(user);
-            }
-            return BadRequest("Problem registering user");
+            if (!result.Succeeded) return BadRequest("Problem registering user");
+
+            var origin = Request.Headers["origin"];
+            var token = await _userManager.GenerateEmailConfirmationTokenAsync(user);
+            token = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(token));
+
+            var verifyUrl = $"{origin}/account/verifyEmail?token={token}&email={user.Email}";
+            var message = $"<p>Please click the below link to verify your email adress:</p><p><a href='{verifyUrl}'>Click to verify email</a></p>";
+
+            await _emailSender.SendEmailAsync(user.Email, "Please verify email", message);
+
+            return Ok("Registration success - please verify email");
         }
+
+        [AllowAnonymous]
+        [HttpPost("verifyEmail")]
+        public async Task<IActionResult> VerifyEmail(string token, string email)
+        {
+            var user = await _userManager.FindByEmailAsync(email);
+            if (user == null) return Unauthorized();
+
+            var decodedTokenBytes = WebEncoders.Base64UrlDecode(token);
+            var decodedToken = Encoding.UTF8.GetString(decodedTokenBytes);
+            var result = await _userManager.ConfirmEmailAsync(user, decodedToken);
+
+            if (!result.Succeeded) return BadRequest("Coud not verify email address");
+
+            return Ok("Email confirmed = you can now login");
+        }
+
+        [AllowAnonymous]
+        [HttpGet("resendEmailConfirmationLink")]
+        public async Task<IActionResult> ResendEmailConfirmationLink(string email)
+        {
+            var user = await _userManager.FindByEmailAsync(email);
+
+            if(user==null) return Unauthorized();
+
+            var origin = Request.Headers["origin"];
+            var token = await _userManager.GenerateEmailConfirmationTokenAsync(user);
+            token = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(token));
+
+            var verifyUrl = $"{origin}/account/verifyEmail?token={token}&email={user.Email}";
+            var message = $"<p>Please click the below link to verify your email adress:</p><p><a href='{verifyUrl}'>Click to verify email</a></p>";
+
+            await _emailSender.SendEmailAsync(user.Email, "Please verify email", message);
+
+            return Ok("Email verification link resend");
+        }
+
 
         [Authorize]
         [HttpGet]
@@ -125,6 +175,8 @@ namespace API.Controllers
                 Photos = new List<Photo> { new Photo { Id = "fb_" + (string)fbInfo.id, Url = (string)fbInfo.picture.data.url, IsMain = true } }
             };
 
+            user.EmailConfirmed = true;
+
             var result = await _userManager.CreateAsync(user);
 
             if (!result.Succeeded) return BadRequest("Problem creating user");
@@ -141,7 +193,7 @@ namespace API.Controllers
             var refreshToken = Request.Cookies["refreshToken"];
             var user = await _userManager.Users
             .Include(r => r.RefreshTokens)
-            .Include(p=>p.Photos)
+            .Include(p => p.Photos)
             .FirstOrDefaultAsync(x => x.UserName == User.FindFirstValue(ClaimTypes.Name));
 
             if (user == null) return Unauthorized();
