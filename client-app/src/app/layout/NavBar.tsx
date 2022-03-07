@@ -17,7 +17,7 @@ export default observer(function NavBar() {
                 {isLoggedIn &&
                     <>
                         <MenuItem as={NavLink} to='/activities' name="Activities" />
-                        <MenuItem as={NavLink} to='/errors' name="Errors" />
+                        {/* <MenuItem as={NavLink} to='/errors' name="Errors" /> */}
                         <MenuItem as={NavLink} to='/createActivity'>
                             <Button positive content="Create Activity"></Button>
                         </MenuItem>
