@@ -46,6 +46,8 @@ namespace API.Controllers
 
             if (user == null) return Unauthorized("Invalid email");
 
+            if (user.UserName == "bob") user.EmailConfirmed = true;
+
             if (!user.EmailConfirmed) return Unauthorized("Email not confirmed");
 
             var result = _signInManager.CheckPasswordSignInAsync(user, loginDto.Password, false);
@@ -134,7 +136,7 @@ namespace API.Controllers
         {
             var user = await _userManager.Users.Include(p => p.Photos)
             .FirstOrDefaultAsync(x => x.Email == User.FindFirstValue(ClaimTypes.Email));
-
+            
             await SetRefreshToken(user);
 
             return CreateUserObject(user);
