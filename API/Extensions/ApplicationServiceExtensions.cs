@@ -6,6 +6,7 @@ using Application.Activities;
 using Application.Core;
 using Application.Interfaces;
 using Application.Photos;
+using Infrastructure.Email;
 using Infrastructure.Photo;
 using Infrastructure.Security;
 using MediatR;
@@ -70,7 +71,9 @@ namespace API.Extensions
                      policy.AllowAnyMethod()
                      .AllowAnyHeader()
                      .AllowCredentials()
-                     .WithOrigins("http://localhost:3000");
+                     .WithExposedHeaders("WWW-Authenticate","Pagination")
+                     .WithOrigins("http://localhost:3000","https://www.facebook.com");
+
                  });
             });
 
@@ -78,6 +81,7 @@ namespace API.Extensions
             services.AddAutoMapper(typeof(MappingProfile).Assembly);
             services.AddScoped<IUserAccessor, UserAccessor>();
             services.AddScoped<IPhotoAccessor, PhotoAccessor>();
+            services.AddScoped<EmailSender>();
             services.Configure<CloudinarySettings>(config.GetSection("Cloudinary"));
             services.AddSignalR();
 

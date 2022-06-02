@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
 using System.Security.Claims;
+using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
 using Domain;
@@ -15,7 +16,7 @@ namespace API.Services
         private readonly IConfiguration config;
         public TokenService(IConfiguration config)
         {
-            this.config = config;            
+            this.config = config;
         }
         public string CreateToken(AppUser user)
         {
@@ -27,20 +28,29 @@ namespace API.Services
             };
 
             var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(config["TokenKey"]));
-            var creds=new SigningCredentials(key,SecurityAlgorithms.HmacSha512Signature);
+            var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha512Signature);
 
-            var tokenDescriptor=new SecurityTokenDescriptor
+            var tokenDescriptor = new SecurityTokenDescriptor
             {
-                Subject=new ClaimsIdentity(claims),
-                Expires=DateTime.Now.AddDays(7),
-                SigningCredentials=creds
+                Subject = new ClaimsIdentity(claims),
+                Expires = DateTime.UtcNow.AddMinutes(10),
+                SigningCredentials = creds
             };
 
-            var tokenHandler=new JwtSecurityTokenHandler();
-            
-            var token=tokenHandler.CreateToken(tokenDescriptor);
+            var tokenHandler = new JwtSecurityTokenHandler();
+
+            var token = tokenHandler.CreateToken(tokenDescriptor);
 
             return tokenHandler.WriteToken(token);
+        }
+
+        public RefreshToken GenerateRefreshToken()
+        {
+            var randomNumber = new byte[32];
+            using var rng = RandomNumberGenerator.Create();
+            rng.GetBytes(randomNumber);
+
+            return new RefreshToken{Token=Convert.ToBase64String(randomNumber)};
         }
     }
 }

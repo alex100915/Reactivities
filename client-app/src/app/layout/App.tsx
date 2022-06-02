@@ -17,6 +17,8 @@ import LoadingComponent from './LoadingComponent';
 import ModalContainer from '../common/modals/ModalContainer';
 import ProfilePage from '../../features/profiles/ProfilePage';
 import PrivateRoute from './PrivateRoute';
+import RegisterSuccess from '../../features/users/RegisterSuccess';
+import ConfirmEmail from '../../features/users/ConfirmEmail';
 
 
 function App() {
@@ -30,6 +32,7 @@ function App() {
     }
     else
     {
+      userStore.getFacebookLoginStatus().then(()=>commonStore.setAppLoaded())
       commonStore.setAppLoaded();
     }
   },[commonStore,userStore])
@@ -39,7 +42,7 @@ function App() {
 
   return (
     <>
-      <ToastContainer position='bottom-right' hideProgressBar />
+      <ToastContainer position='bottom-right'  hideProgressBar />
       <ModalContainer/>
       <Route path='/' exact component={HomePage}></Route>
       <Route path={"/(.+)"}
@@ -52,8 +55,10 @@ function App() {
                 <PrivateRoute path="/activities/:id" component={ActivityDetails}/>
                 <PrivateRoute key={location.key} path={["/createActivity", "/manage/:id"]} component={ActivityForm}/>
                 <PrivateRoute path='/profiles/:username' component={ProfilePage}/>
-                <PrivateRoute path="/errors" component={TestErrors}/>
+                {/* <PrivateRoute path="/errors" component={TestErrors}/> */}
                 <Route path="/server-error" component={ServerError}></Route>
+                <Route path="/account/registerSuccess" component={RegisterSuccess}></Route>
+                <Route path="/account/verifyEmail" component={ConfirmEmail}></Route>
                 <Route component={NotFound}></Route>
               </Switch>
             </Container>
