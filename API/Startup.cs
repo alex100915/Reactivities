@@ -10,6 +10,7 @@ namespace API
 {
     public class Startup
     {
+        // small change
         public Startup(IConfiguration configuration)
         {
             Configuration = configuration;
